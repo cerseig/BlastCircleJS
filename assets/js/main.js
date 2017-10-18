@@ -1,6 +1,26 @@
-/**
+/*****************
+*** AUDIO INIT ***
+******************/
+// class Audio {
+//
+//     window.AudioContext = window.AudioContext || window.webkitAudioContext || window.mozAudioContext || window.msAudioContext || window.oAudioContext;
+//
+//     var audioCtx = new AudioContext(),
+//         audioBuffer,
+//         audioSource,
+//         analyser = audioCtx.createAnalyser(),
+//         frequencyData = new Uint8Array(analyser.frequencyBinCount),
+//         audio = new Audio();
+//
+//     audio.controls = true;
+//     audio.src = "assets/sound/allnight.m4a";
+//
+// }
+
+
+/*****************
 *** SCENE INIT ***
-**/
+******************/
 var canvas = document.getElementById( 'myCanvas' ),
     ctx = canvas.getContext( '2d' );
     r = 0,
