@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+    </head>
+    <body>
+
+        <script type="text/javascript">
+        var pointDest = []
+        var quantity = 100
+
+        class Circle {
+            constructor() {
+                this.angle = angle
+                this.radius = radius
+                this.position = []
+                this.trigo = []
+                this.rank = rank
+                this.ctx = ctx
+            }
+            draw() {
+                ctx.beginPath()
+                ctx.save()
+                ctx.strokeStyle = getRandomColor()
+                ctx.translate(this.position[0], this.position[1])
+                ctx.stroke()
+                ctx.closePath()
+                ctx.restore()
+            }
+            frame(time) {
+                this.radius = simplex.noise2D(Math.cos(this.angle) + time, Math.sin(this.angle)+time) * 50
+                this.position[0] = this.radius * this.trigo[0] + canvas.width/2
+                this.position[1] = this.radius * this.trigo[1] + canvas.width/2
+            }
+        }
+
+        var step = Math.PI*2/quantity
+        for (var i = 0; i < quantity; i++) {
+            var point = new Circle({
+                ctx:ctx,
+                rank:i,
+                angle: step*i
+            })
+            pointDest.push(point)
+        }
+
+        function drawLine() {
+            ctx.beginPath()
+            ctx.save()
+            ctx.moveTo(pointDest[0].position[0], pointDest[0].position[1])
+            for (var i = 0; i < pointDest.length; i++) {
+                ctx.lineTo(pointDest[i].position[0], pointDest[i].position[1])
+            }
+            ctx.closePath()
+            ctx.strokeStyle = getRandomColor()
+            ctx.stroke()
+            ctx.restore()
+        }
+        function update() {
+            time += 0.005
+            ctx.clearRect(0,0, canvas.width, canvas.height)
+            for (var i = 0; i < pointDest.length; i++) {
+                pointDest[i].update(time)
+                pointDest[i].draw()
+            }
+            drawLine()
+            requestAnimationFrame( update )
+        }
+
+        update()
+        </script>
+
+    </body>
+</html>
