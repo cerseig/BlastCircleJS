@@ -21,14 +21,6 @@
       return color[index];
     }
 
-    function stop() {
-
-    }
-    function start() {
-
-    }
-
-
     /*****************
     *** AUDIO INIT ***
     ******************/
@@ -36,6 +28,7 @@
         constructor(url) {
             window.AudioContext=window.AudioContext||window.webkitAudioContext||window.mozAudioContext;
             this.audioCtx = new AudioContext()
+            this.gainNode = this.audioCtx.createGain()
             this.audioBuffer
             this.audioSource
             this.analyser = this.audioCtx.createAnalyser()
@@ -63,13 +56,6 @@
               // connect the audio source to context's output
               this.audioSource.connect( this.analyser )
               this.analyser.connect( this.audioCtx.destination )
-
-            //   document.getElementById('pause').addEventListener("click", function() {
-            //        this.analyser.disconnect(this.audioCtx.destination)
-            //     });
-            //     document.getElementById('play').addEventListener("click", function() {
-            //         this.analyser.connect( this.audioCtx.destination )
-            //     });
 
               // play sound
               this.audioSource.start()
@@ -145,7 +131,6 @@
         this.radius = radius
         this.ctx = ctx
         this.frequence = frequence
-        this.opacity = 0.1
         this.x = Math.cos(this.angle) * (this.radius + value2d)
         this.y = Math.sin(this.angle) * (this.radius + value2d)
       }
@@ -217,10 +202,37 @@
             ctx.closePath()
         }
         update() {
+            if(this.radius > 410) {
+                this.color = 'rgba(0,0,0,0.9)'
+            }
+            if(this.radius > 420) {
+                this.color = 'rgba(0,0,0,0.8)'
+            }
+            if(this.radius > 430) {
+                this.color = 'rgba(0,0,0,0.7)'
+            }
+            if(this.radius > 440) {
+                this.color = 'rgba(0,0,0,0.6)'
+            }
+            if(this.radius > 450) {
+                this.color = 'rgba(0,0,0,0.5)'
+            }
+            if(this.radius > 460) {
+                this.color = 'rgba(0,0,0,0.4)'
+            }
+            if(this.radius > 470) {
+                this.color = 'rgba(0,0,0,0.3)'
+            }
+            if(this.radius > 480) {
+                this.color = 'rgba(0,0,0,0.2)'
+            }
+            if(this.radius > 490) {
+                this.color = 'rgba(0,0,0,0.1)'
+            }
             if(this.radius > 500) {
                 this.color = 'rgba(0,0,0,0)'
             }
-            this.radius += 0.1
+            this.radius += 2
             for (var i = 0; i < this.points.length; i++) {
                 this.points[i].update(this.radius);
             }
@@ -229,7 +241,7 @@
 
     var pool = new Pool({
         klass: Point,
-        nbEntities: 2000
+        nbEntities: 10000
     })
 
 
@@ -265,6 +277,17 @@
       LAST_TIME = Date.now();
       sound.analyser.getByteFrequencyData(sound.frequencyData);
 
+      var cumul = 0;
+      for ( var i = 0; i < 40; i++ ) {
+          // get the frequency according to current i
+          let percentIdx = i/40;
+          let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
+
+        cumul += sound.frequencyData[frequencyIdx];
+
+        frequence = cumul/255
+      }
+
       for ( var i = 0; i < circles.length; i++ ) {
           var circle = circles[i]
           circle.update()
@@ -272,24 +295,10 @@
           lastCoord = [];
       }
 
-    //   console.log(circle);
-      ctx.fillStyle = 'rgba(80,29,67,0.3)'
+      ctx.fillStyle = 'rgba(80,29,67,0.4)'
       ctx.fillRect(0, 0, canvasWidth, canvasHeight)
-
-      var cumul = 0;
-
       ctx.beginPath()
-      ctx.lineWidth = 5
-
-      for ( var i = 0; i < 100; i++ ) {
-          // get the frequency according to current i
-          let percentIdx = i/100;
-          let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
-
-        cumul += sound.frequencyData[frequencyIdx];
-
-        frequence = cumul/255
-      }
+      ctx.lineWidth = 3
       ctx.restore()
       ctx.closePath()
       ctx.stroke()
@@ -299,7 +308,7 @@
     setInterval( function() {
         var circle = new Circle()
         circles.push( circle )
-    }, 5000)
+    }, 700)
 
     /**
      * onResize
