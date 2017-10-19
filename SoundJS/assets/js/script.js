@@ -3,6 +3,8 @@
     var canvas = document.querySelector('canvas');
     var ctx = canvas.getContext('2d');
 
+    var circles = []
+
     const color = [
       '#841e3e',
       '#b7263d',
@@ -70,10 +72,51 @@
         }
     }
 
-    var sound = new Audio('./assets/sounds/roses.mp3');
+    var sound = new Audio('./assets/sounds/boumtam.mp3')
+
+console.log('TEST');
+
+    /*****************
+    *** POINT INIT ***
+    ******************/
+    class Pool {
+        constructor( opts ) {
+            this.entities = []
+            this.activeEntities = []
+            this.notActiveEntities = []
+            this.klass = opts.klass
+            this.nbEntities = opts.nbEntities
+            this.allocate()
+        }
+        allocate() {
+            for (var i = 0; i < this.nbEntities; i++) {
+                var entity = new this.klass()
+                entity.entityId = Math.random()
+                this.entities.push( entity )
+                this.notActiveEntities.push( entity )
+            }
+            // canvasWidth.log('not active ->', this.notActiveEntities);
+        }
+        getEntity( params ) {
+
+            var entity = this.notActiveEntities[0]
+            this.notActiveEntities.shift()
+            this.activeEntities.push( entity )
+            entity.reset( params )
+
+            // canvasWidth.log('not active ->', this.notActiveEntities);
+            return entity
+
+        }
+        releaseEntity() {
+            var index = this.activeEntities.indexOf( entity )
+
+            this.activeEntities.splice(index, 1)
+            this.notActiveEntities.push( entity )
+        }
+    }
 
     var angle = 0,
-    points = [],
     lastCoord = [],
     simplex = new SimplexNoise(),
     value2d = 0,
@@ -82,62 +125,125 @@
     x = 0,
     y = 0;
 
+    /*****************
+    *** POINT INIT ***
+    ******************/
     class Point {
-      constructor (angle, ctx, frequence) {
+      constructor (angle, ctx, frequence, radius) {
         this.angle = angle
-        this.radius = 200
+        this.radius = radius
         this.ctx = ctx
         this.frequence = frequence
         this.x = Math.cos(this.angle) * (this.radius + value2d)
         this.y = Math.sin(this.angle) * (this.radius + value2d)
       }
+      reset( params ) {
+          this.angle = params.angle
+          this.ctx = params.ctx
+          this.frequence = params.frequence
+          this.radius = params.radius
+          this.x = params.x
+          this.y = params.y
+      }
       draw() {
-        this.ctx.beginPath();
-        this.ctx.save();
+        this.ctx.beginPath()
+        this.ctx.save()
+        this.ctx.translate(canvasWidth/2, canvasHeight/2)
+        this.ctx.moveTo(lastCoord.x, lastCoord.y)
+        this.ctx.lineTo(this.x, this.y)
+        // this.ctx.moveTo(this.points[0].x, this.points[0].y)
+        // this.ctx.lineTo(this.points[125].x, this.points[125].y)
+        this.ctx.restore()
+        this.ctx.closePath()
+        this.ctx.stroke()
 
-        this.ctx.strokeStyle = getRandomColor()
-
-        this.ctx.translate(canvasWidth/2, canvasHeight/2);
-        // this.ctx.arc(this.x, this.y, 2, 0, Math.PI*2);
-        this.ctx.moveTo(lastCoord.x, lastCoord.y);
-        this.ctx.lineTo(this.x, this.y);
-
-        this.ctx.stroke();
-        this.ctx.fill();
-
-        this.ctx.restore();
-        this.ctx.closePath();
+        // canvasWidth.log(lastCoord.x);
 
         lastCoord = {
           x: this.x,
           y: this.y
         }
       }
-      frame() {
-        time += 0.000025;
-        value2d = simplex.noise2D(Math.cos(this.angle) + time, Math.sin(this.angle) + time) * (frequence);
-        this.x = Math.cos(this.angle) * (this.radius + value2d);
-        this.y = Math.sin(this.angle) * (this.radius + value2d);
+      update(radius) {
+        time += 0.000025
+        value2d = simplex.noise2D(Math.cos(this.angle) + time, Math.sin(this.angle) + time) * frequence
+        this.x = Math.cos(this.angle) * (radius + value2d)
+        this.y = Math.sin(this.angle) * (radius + value2d)
       }
     }
+    /*****************
+    *** CIRCLE INIT **
+    ******************/
+    class Circle {
+        constructor() {
+            this.points = []
+            this.radius = 0
 
-    // update()
-    //
-    // function update() {
-    //   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-    //   requestAnimationFrame( update );
-    //   for (var i = 0; i < points.length; i++) {
-    //     points[i].frame();
-    //     points[i].draw();
-    //   }
-    // }
+            for (var i = 0; i < Math.PI*2 + 1; i+=0.05) {
+              angle += 0.05; // augmenter du même angle pour un cercle parfait
+              var point = pool.getEntity({
+                  angle: angle,
+                  ctx: ctx,
+                  frequence: frequence,
+                  radius: this.radius,
+                  x: Math.cos(angle) * (this.radius + value2d),
+                  y: Math.cos(angle) * (this.radius + value2d)
+              }); // on créé un nouvel objet Point
+              this.points.push(point); // on pousse dans le tableau Points, chaque point créé
+            //   console.log(point.x);
+            }
 
-    // for (var i = 0; i <Math.PI*2; i+=0.05) {
-    //   angle += 0.05; // augmenter du même angle pour un cercle parfait
-    //   var point = new Point(angle, ctx); // on créé un nouvel objet Point
-    //   point.draw()
-    //   points.push(point); // on pousse dans le tableau Points, chaque point créé
-    // }
+            // ctx.moveTo(this.points[0].x, this.points[0].y)
+            // ctx.lineTo(this.points[125].x, this.points[125].y)
+            // ctx.closePath()
+            // ctx.stroke()
+
+            // console.log(this.radius);
+
+            // console.log(this.points[0]);
+            // let test = this.points[0];
+            // console.log(test.angle);
+            // console.log(this.points[0]['x']);
+
+
+        }
+        draw() {
+            for (var i = 0; i < this.points.length; i++) {
+                this.points[i].draw();
+
+            }
+
+            console.log(this.points[this.points.length - 1]);
+            ctx.moveTo(this.points[0].x, this.points[0].x)
+            ctx.lineTo(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y)
+            //ctx.stroke()
+            ctx.closePath()
+            // console.log(this.points[125].x);
+        }
+        update() {
+            this.radius += 0.5
+            for (var i = 0; i < this.points.length; i++) {
+                this.points[i].update(this.radius);
+            }
+
+
+
+            // console.log(this.points[0].x);
+            // console.log(this.points[125].x);
+
+            // ctx.moveTo(this.points[125].x, this.points[125].y)
+            // ctx.lineTo(this.points[0].x, this.points[0].y)
+            // ctx.stroke()
+        }
+    }
+
+    var pool = new Pool({
+        klass: Point,
+        nbEntities: 1890
+    })
+    var circle = new Circle()
+    circles.push( circle )
+
 
     /**
       Time stuff
@@ -145,9 +251,6 @@
     var DELTA_TIME = 0;
     var LAST_TIME = Date.now();
 
-    var opts = {
-      barWidth: 10
-    }
 
     function initCanvas() {
       onResize()
@@ -159,7 +262,7 @@
     function addListeners() {
 
       window.addEventListener( 'resize', onResize.bind(this) );
-      rafId = requestAnimationFrame( frame )
+    //   rafId = requestAnimationFrame( frame )
 
     }
 
@@ -168,54 +271,56 @@
      * - Triggered on every TweenMax tick
      */
     function frame() {
+
       rafId = requestAnimationFrame( frame )
 
       DELTA_TIME = Date.now() - LAST_TIME;
       LAST_TIME = Date.now();
-
-      // analyser.getByteFrequencyData(frequencyData);
-
       sound.analyser.getByteFrequencyData(sound.frequencyData);
-      ctx.clearRect( 0, 0, canvasWidth, canvasHeight )
 
-      for (var i = 0; i < points.length; i++) {
-          points[i].frame();
-          points[i].draw();
+
+    //   var firstItem = this.points[0];
+    //   var lastItem = this.points[this.points.length - 1];
+
+      for ( var i = 0; i < circles.length; i++ ) {
+          var circle = circles[i]
+          circle.update()
+          circle.draw()
+
+          ctx.strokeStyle = getRandomColor()
+
+          lastCoord = [];
       }
+      ctx.fillStyle = 'rgba(80,29,67,0.3)'
+      ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
-      var barWidth = opts.barWidth;
-      var margin = 2;
-      var nbBars = canvasWidth / ( barWidth - margin );
       var cumul = 0;
 
       ctx.beginPath()
+      ctx.lineWidth = 5
 
-      for ( var i = 0; i < 50; i++ ) {
-
+      for ( var i = 0; i < 20; i++ ) {
           // get the frequency according to current i
-          let percentIdx = i/50;
+          let percentIdx = i/100;
           let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
 
-
-        // ctx.rect( i * barWidth + ( i * margin ), canvasHeight - frequencyData[frequencyIdx] , barWidth, frequencyData[frequencyIdx] );
-        // ctx.arc(canvasWidth/2, canvasHeight/2, sound.frequencyData[frequencyIdx], 0, Math.PI*2)
         cumul += sound.frequencyData[frequencyIdx];
-
         frequence = cumul/255
 
-
       }
-      ctx.stroke()
+      ctx.restore()
       ctx.closePath()
+      ctx.stroke()
 
     }
 
+    setInterval( function() {
 
-    for (var i = 0; i <Math.PI*2; i+=0.05) {
-      angle += 0.05; // augmenter du même angle pour un cercle parfait
-      var point = new Point(angle, ctx, this.frequence); // on créé un nouvel objet Point
-      points.push(point); // on pousse dans le tableau Points, chaque point créé
-    }
+        var circle = new Circle()
+        circles.push( circle )
+
+
+    }, 5000)
 
 
     /**
@@ -232,7 +337,6 @@
       canvas.style.width = canvasWidth + 'px'
       canvas.style.height = canvasHeight + 'px'
     }
-
 
     initCanvas()
     sound.loadSound()
