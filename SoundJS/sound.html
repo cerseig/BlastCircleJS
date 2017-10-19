@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title></title>
+  <title>Blast Color Circle</title>
+  <link rel="stylesheet" href="assets/css/font-awesome.min.css">
   <style type="text/css">
     body, html {
       margin: 0;
@@ -10,9 +11,23 @@
     #myCanvas {
       background: #501d43;
     }
+    .panel-control {
+        position: absolute;
+        color: #FFF;
+        font-weight: bold;
+        padding-top: 10px;
+    }
+    .panel-control i {
+        padding: 0 20px;
+    }
   </style>
 </head>
 <body>
+
+    <div class="panel-control">
+        <div id="pause"><i class="fa fa-play"></i></div>
+        <div id="play"><i class="fa fa-pause"></i></div>
+    </div>
 
   <canvas id="myCanvas"></canvas>
 

@@ -21,6 +21,14 @@
       return color[index];
     }
 
+    function stop() {
+
+    }
+    function start() {
+
+    }
+
+
     /*****************
     *** AUDIO INIT ***
     ******************/
@@ -56,6 +64,13 @@
               this.audioSource.connect( this.analyser )
               this.analyser.connect( this.audioCtx.destination )
 
+            //   document.getElementById('pause').addEventListener("click", function() {
+            //        this.analyser.disconnect(this.audioCtx.destination)
+            //     });
+            //     document.getElementById('play').addEventListener("click", function() {
+            //         this.analyser.connect( this.audioCtx.destination )
+            //     });
+
               // play sound
               this.audioSource.start()
               // repeat sound
@@ -74,7 +89,6 @@
 
     var sound = new Audio('./assets/sounds/boumtam.mp3')
 
-console.log('TEST');
 
     /*****************
     *** POINT INIT ***
@@ -95,7 +109,6 @@ console.log('TEST');
                 this.entities.push( entity )
                 this.notActiveEntities.push( entity )
             }
-            // canvasWidth.log('not active ->', this.notActiveEntities);
         }
         getEntity( params ) {
 
@@ -104,13 +117,11 @@ console.log('TEST');
             this.activeEntities.push( entity )
             entity.reset( params )
 
-            // canvasWidth.log('not active ->', this.notActiveEntities);
             return entity
 
         }
         releaseEntity() {
             var index = this.activeEntities.indexOf( entity )
-
             this.activeEntities.splice(index, 1)
             this.notActiveEntities.push( entity )
         }
@@ -134,6 +145,7 @@ console.log('TEST');
         this.radius = radius
         this.ctx = ctx
         this.frequence = frequence
+        this.opacity = 0.1
         this.x = Math.cos(this.angle) * (this.radius + value2d)
         this.y = Math.sin(this.angle) * (this.radius + value2d)
       }
@@ -148,16 +160,14 @@ console.log('TEST');
       draw() {
         this.ctx.beginPath()
         this.ctx.save()
+        this.ctx.globalAlpha = this.opacity
         this.ctx.translate(canvasWidth/2, canvasHeight/2)
         this.ctx.moveTo(lastCoord.x, lastCoord.y)
         this.ctx.lineTo(this.x, this.y)
-        // this.ctx.moveTo(this.points[0].x, this.points[0].y)
-        // this.ctx.lineTo(this.points[125].x, this.points[125].y)
         this.ctx.restore()
         this.ctx.closePath()
         this.ctx.stroke()
 
-        // canvasWidth.log(lastCoord.x);
 
         lastCoord = {
           x: this.x,
@@ -171,6 +181,7 @@ console.log('TEST');
         this.y = Math.sin(this.angle) * (radius + value2d)
       }
     }
+
     /*****************
     *** CIRCLE INIT **
     ******************/
@@ -178,6 +189,8 @@ console.log('TEST');
         constructor() {
             this.points = []
             this.radius = 0
+            this.color = getRandomColor()
+
 
             for (var i = 0; i < Math.PI*2 + 1; i+=0.05) {
               angle += 0.05; // augmenter du même angle pour un cercle parfait
@@ -190,59 +203,35 @@ console.log('TEST');
                   y: Math.cos(angle) * (this.radius + value2d)
               }); // on créé un nouvel objet Point
               this.points.push(point); // on pousse dans le tableau Points, chaque point créé
-            //   console.log(point.x);
             }
-
-            // ctx.moveTo(this.points[0].x, this.points[0].y)
-            // ctx.lineTo(this.points[125].x, this.points[125].y)
-            // ctx.closePath()
-            // ctx.stroke()
-
-            // console.log(this.radius);
-
-            // console.log(this.points[0]);
-            // let test = this.points[0];
-            // console.log(test.angle);
-            // console.log(this.points[0]['x']);
-
 
         }
         draw() {
             for (var i = 0; i < this.points.length; i++) {
                 this.points[i].draw();
-
             }
-
-            console.log(this.points[this.points.length - 1]);
+            ctx.strokeStyle = this.color
+            // link between first and last points of the circle
             ctx.moveTo(this.points[0].x, this.points[0].x)
             ctx.lineTo(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y)
-            //ctx.stroke()
             ctx.closePath()
-            // console.log(this.points[125].x);
         }
         update() {
-            this.radius += 0.5
+            if(this.radius > 500) {
+                this.color = 'rgba(0,0,0,0)'
+            }
+            this.radius += 0.1
             for (var i = 0; i < this.points.length; i++) {
                 this.points[i].update(this.radius);
             }
-
-
-
-            // console.log(this.points[0].x);
-            // console.log(this.points[125].x);
-
-            // ctx.moveTo(this.points[125].x, this.points[125].y)
-            // ctx.lineTo(this.points[0].x, this.points[0].y)
-            // ctx.stroke()
         }
     }
 
     var pool = new Pool({
         klass: Point,
-        nbEntities: 1890
+        nbEntities: 2000
     })
-    var circle = new Circle()
-    circles.push( circle )
+
 
 
     /**
@@ -262,13 +251,11 @@ console.log('TEST');
     function addListeners() {
 
       window.addEventListener( 'resize', onResize.bind(this) );
-    //   rafId = requestAnimationFrame( frame )
 
     }
 
     /**
      * update
-     * - Triggered on every TweenMax tick
      */
     function frame() {
 
@@ -278,19 +265,14 @@ console.log('TEST');
       LAST_TIME = Date.now();
       sound.analyser.getByteFrequencyData(sound.frequencyData);
 
-
-    //   var firstItem = this.points[0];
-    //   var lastItem = this.points[this.points.length - 1];
-
       for ( var i = 0; i < circles.length; i++ ) {
           var circle = circles[i]
           circle.update()
           circle.draw()
-
-          ctx.strokeStyle = getRandomColor()
-
           lastCoord = [];
       }
+
+    //   console.log(circle);
       ctx.fillStyle = 'rgba(80,29,67,0.3)'
       ctx.fillRect(0, 0, canvasWidth, canvasHeight)
 
@@ -299,33 +281,28 @@ console.log('TEST');
       ctx.beginPath()
       ctx.lineWidth = 5
 
-      for ( var i = 0; i < 20; i++ ) {
+      for ( var i = 0; i < 100; i++ ) {
           // get the frequency according to current i
           let percentIdx = i/100;
           let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
 
         cumul += sound.frequencyData[frequencyIdx];
-        frequence = cumul/255
 
+        frequence = cumul/255
       }
       ctx.restore()
       ctx.closePath()
       ctx.stroke()
-
     }
 
-    setInterval( function() {
 
+    setInterval( function() {
         var circle = new Circle()
         circles.push( circle )
-
-
     }, 5000)
-
 
     /**
      * onResize
-     * - Triggered when window is resized
      * @param  {obj} evt
      */
     function onResize( evt ) {
