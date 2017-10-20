@@ -46,6 +46,7 @@ class Audio {
           this.play()
 
         }.bind( this ), function(){
+            //if not music, alert people
             alert('Music not load')
         });
       }.bind( this )
@@ -58,6 +59,7 @@ class Audio {
     }
 
     pause() {
+        // stop the sound
         this.audioSource.stop()
     }
 }
@@ -74,7 +76,7 @@ class Pool {
         this.nbEntities = opts.nbEntities
         this.allocate()
     }
-    allocate() {
+    allocate() { // create points
         for (var i = 0; i < this.nbEntities; i++) {
             var entity = new this.klass()
             entity.entityId = Math.random()
@@ -82,17 +84,16 @@ class Pool {
             this.notActiveEntities.push( entity )
         }
     }
-    getEntity( params ) {
+    getEntity( params ) { // draw points (Switch between 2 arrays)
 
         var entity = this.notActiveEntities[0]
         this.notActiveEntities.shift()
         this.activeEntities.push( entity )
         entity.reset( params )
-
         return entity
 
     }
-    releaseEntity(entity) {
+    releaseEntity(entity) { // delete points (re swith between 2 arrays)
         var index = this.activeEntities.indexOf( entity )
         this.activeEntities.splice(index, 1)
         this.notActiveEntities.push( entity )
@@ -129,8 +130,6 @@ class Point {
     this.ctx.restore()
     this.ctx.closePath()
     this.ctx.stroke()
-
-
     lastCoord = {
       x: this.x,
       y: this.y
@@ -156,9 +155,9 @@ class Circle {
         this.create()
     }
 
-    create() {
+    create() { // create circle with points
         for (var i = 0; i < Math.PI*2 + 1; i+=0.05) {
-          angle += 0.05; // augmenter du même angle pour un cercle parfait
+          angle += 0.05;
           var point = this.pool.getEntity({
               angle: angle,
               ctx: ctx,
@@ -166,29 +165,30 @@ class Circle {
               radius: this.radius,
               x: Math.cos(angle) * (this.radius + value2d),
               y: Math.cos(angle) * (this.radius + value2d)
-          }); // on créé un nouvel objet Point
-          this.points.push(point); // on pousse dans le tableau Points, chaque point créé
+          });
+          this.points.push(point);
         }
     }
 
-    destroy() {
+    destroy() { // delete points of the circle
         for (var i = 0; i < this.points.length; i++) {
             this.pool.releaseEntity(this.points[i])
         }
     }
 
-    draw() {
+    draw() { // draw circle thanks to points
         for (var i = 0; i < this.points.length; i++) {
             this.points[i].draw();
         }
         ctx.strokeStyle = this.color
+
         // link between first and last points of the circle
         ctx.moveTo(this.points[0].x, this.points[0].x)
         ctx.lineTo(this.points[this.points.length - 1].x, this.points[this.points.length - 1].y)
         ctx.closePath()
     }
 
-    update() {
+    update() { // increase radius according to the time
         this.radius += 2
         for (var i = 0; i < this.points.length; i++) {
             this.points[i].update(this.radius);
@@ -202,7 +202,7 @@ const ctx = canvas.getContext('2d');
 const audio = new Audio('./assets/sounds/yellowclaw.mp3')
 const pool = new Pool({
     klass: Point,
-    nbEntities: 1500
+    nbEntities: 1500 // total number of points
 })
 const color = [
   '#841e3e',
@@ -240,15 +240,18 @@ function resize() {
 function addListeners() {
     /* Resize Listener */
     window.addEventListener('resize', resize, false);
+
     /* Audio control listener */
     window.onkeydown = function (e) {
         if(e.keyCode == 32) { audio.pause(); }
-    }
+    } // press space key
+
     $('.mute').on('click', function() {
         audio.pause();
         $(this).css('display', 'none');
         $('.refresh').css('display', 'block');
-    })
+    }) // click on the mute button to turn off the music
+
     /* Refresh listener */
     $('.refresh').on('click', function() {
         location.reload();
@@ -270,7 +273,7 @@ function render() {
     for ( var i = 0; i < 40; i++ ) {
       // get the frequency according to current i
       let percentIdx = i/40;
-      let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
+      let frequencyIdx = Math.floor(1024 * percentIdx) // buffer had 1024 valeurs,
 
       cumul += audio.frequencyData[frequencyIdx] * 2;
       frequence = cumul/255
@@ -301,21 +304,21 @@ function render() {
         if (frequence > 24  && lastindex > 20) {
             createCircle()
             lastindex = 0
-        }
+        } // create circles when drop is important
         if (lastindex > 50) {
             createCircle()
             lastindex = 0
         } else {
             lastindex++
-        }
-    }
+        } // allow to have interval between circles
+    } // create circles if frequence is not null
 
     for ( var i = 0; i < circles.length; i++ ) {
         var circle = circles[i]
         if (circle.radius > 500) {
             circle.destroy()
             circles.splice(i, 1)
-        }
+        } // allow to delete circles after radius > 500
         circle.update()
         circle.draw()
         lastCoord = [];
@@ -324,12 +327,12 @@ function render() {
     if(frequence > 23) {
       ctx.fillStyle = 'rgba(255,255,255, 0.3)'
       $('#myCanvas').css('background', '#FFF')
-      // $('h3').css('color', '#501d43')
     } else {
       ctx.fillStyle = 'rgba(80,29,67,0.3)'
       $('#myCanvas').css('background', '#501d43')
       $('h3').css('color', '#FFF')
     }
+
     ctx.fillRect(0, 0, canvasWidth, canvasHeight)
     ctx.beginPath()
     ctx.lineWidth = 3
@@ -341,7 +344,6 @@ function render() {
 function init() {
     addListeners()
     resize()
-    // createCircles()
     render()
 }
 
@@ -352,6 +354,7 @@ $('#start').on('click', function() {
     $('.landing-gate').fadeOut('slow');
     audio.loadSound();
 });
+
 init()
 
 /*****************
