@@ -1,0 +1,112 @@
+/**************
+*** GENERAL ***
+***************/
+* {
+    box-sizing: border-box;
+}
+body, html {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing : antialiased;
+}
+
+/*******************
+*** LANDING GATE ***
+********************/
+.landing-gate {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    text-align: center;
+}
+.landing-gate h1 {
+    font-family: 'Montserrat';
+    font-size: 5em;
+    line-height: 80px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    color: #ed6342;
+    transition: all 0.5s ease;
+}
+.landing-gate h2 {
+    font-family: 'Assistant';
+    font-size: 1.5em;
+    font-weight: 200;
+    letter-spacing: 2px;
+    margin-top: 0px;
+    margin-bottom: 80px;
+    color: #fefefe;
+}
+.landing-gate a {
+    border-radius: 0;
+    background: none;
+    border: none;
+    border: 2px solid #ed6342;
+    outline: 0;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    font-family: 'Assistant';
+    font-size: 2em;
+    padding: 10px 50px;
+    cursor: pointer;
+    color: #ed6342;
+    transition: all 0.5s ease;
+
+}
+.landing-gate a:focus {
+    outline: none;
+}
+
+/********************
+*** PANEL CONTROL ***
+*********************/
+.panel-control {
+    position: absolute;
+    color: #FFF;
+    font-weight: bold;
+    display: none;
+}
+.panel-control .refresh {
+    display: none;
+}
+.panel-control i {
+    font-size: 1.8em;
+    opacity: 0.5;
+    padding: 20px 20px;
+    transition: all 0.5s ease;
+}
+.panel-control i:hover {
+    opacity: 1;
+}
+h3 {
+    display: none;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    color: #fefefe;
+    text-align: center;
+    text-transform: uppercase;
+    font-family: 'Montserrat';
+    font-size: 3em;
+    line-height: 40px;
+    transition: all 0.5s ease;
+}
+h3 small {
+    margin-top: 5px;
+    font-family: 'Assistant';
+    font-weight: 200;
+    font-size: 0.6em;
+}
+
+/*************
+*** CANVAS ***
+**************/
+#myCanvas {
+  background: #501d43;
+}

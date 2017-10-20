@@ -21,9 +21,7 @@
       return color[index];
     }
 
-    /*****************
-    *** AUDIO INIT ***
-    ******************/
+
 
 
     var sound = new Audio('./assets/sounds/photomaton.mp3')

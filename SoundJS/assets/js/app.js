@@ -7,6 +7,9 @@ frequence = 0,
 x = 0,
 y = 0;
 
+/*****************
+*** AUDIO INIT ***
+******************/
 class Audio {
     constructor(url) {
         window.AudioContext=window.AudioContext||window.webkitAudioContext||window.mozAudioContext;
@@ -58,6 +61,10 @@ class Audio {
         this.audioSource.stop()
     }
 }
+
+/*****************
+*** POOL INIT ***
+******************/
 class Pool {
     constructor( opts ) {
         this.entities = []
@@ -91,6 +98,10 @@ class Pool {
         this.notActiveEntities.push( entity )
     }
 }
+
+/*****************
+*** POINT INIT ***
+******************/
 class Point {
   constructor (angle, ctx, frequence, radius) {
     this.angle = angle
@@ -132,6 +143,10 @@ class Point {
     this.y = Math.sin(this.angle) * (radius + value2d)
   }
 }
+
+/*****************
+*** CIRCLE INIT ***
+******************/
 class Circle {
     constructor(pool) {
         this.points = []
@@ -184,7 +199,7 @@ class Circle {
 /* App */
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-const audio = new Audio('./assets/sounds/fivehours.mp3')
+const audio = new Audio('./assets/sounds/photomaton.mp3')
 const pool = new Pool({
     klass: Point,
     nbEntities: 1500
@@ -229,6 +244,15 @@ function addListeners() {
     window.onkeydown = function (e) {
         if(e.keyCode == 32) { audio.pause(); }
     }
+    $('.mute').on('click', function() {
+        audio.pause();
+        $(this).css('display', 'none');
+        $('.refresh').css('display', 'block');
+    })
+    /* Refresh listener */
+    $('.refresh').on('click', function() {
+        location.reload();
+    });
 
 }
 
@@ -236,16 +260,6 @@ function createCircle() {
     var circle = new Circle(pool)
     circles.push( circle )
 }
-
-// function doSomething() {}
-//
-// (function loop() {
-//     var rand = Math.round(Math.random() * (3000 - 500)) + 500;
-//     setTimeout(function() {
-//             doSomething();
-//             loop();
-//     }, rand);
-// }());
 
 // function createCircles() {
 //     var rand = getRandom(200, 1000);
@@ -269,12 +283,35 @@ function render() {
       let percentIdx = i/40;
       let frequencyIdx = Math.floor(1024 * percentIdx) //le buffer a 1024 valeurs,
 
-      cumul += audio.frequencyData[frequencyIdx] * 1.5;
+      cumul += audio.frequencyData[frequencyIdx] * 2;
       frequence = cumul/255
 
     }
 
+    if (frequence < 1) {
+        $('h3').css('font-size', '2em')
+        $('h3').css('opacity', '0')
+    } else if (frequence < 5 ) {
+        $('h3').css('font-size', '2.2em')
+        $('h3').css('opacity', '0.05')
+    } else if (frequence < 10 ) {
+        $('h3').css('font-size', '2.4em')
+        $('h3').css('opacity', '0.1')
+    } else if (frequence < 15 ) {
+        $('h3').css('font-size', '2.8em')
+        $('h3').css('opacity', '0.4')
+    } else if (frequence < 20 ) {
+        $('h3').css('font-size', '5em')
+        $('h3').css('opacity', '0.8')
+    } else if (frequence < 25 ) {
+        $('h3').css('opacity', '1')
+    }
+
     if (frequence > 1) {
+        if (frequence > 24  && lastindex > 20) {
+            createCircle()
+            lastindex = 0
+        }
         if (lastindex > 50) {
             createCircle()
             lastindex = 0
@@ -304,12 +341,34 @@ function render() {
 }
 
 function init() {
-    resize()
     addListeners()
-    audio.loadSound()
+    resize()
     // createCircles()
     render()
 }
 
 /* And run ! :D */
+$('#start').on('click', function() {
+    $('.panel-control').css('display', 'block');
+    $('h3').fadeIn('slow');
+    $('.landing-gate').fadeOut('slow');
+    audio.loadSound();
+});
 init()
+
+/*****************
+*** STYLE ***
+******************/
+$( "#start" )
+  .mouseenter(function() {
+        $('#start').css('color', '#f6c543');
+        $('#start').css('border-color', '#f6c543');
+        $('#start').css('font-weight', 'bold');
+        $('h1').css('color', '#f6c543');
+  })
+  .mouseleave(function() {
+        $('#start').css('color', '#ed6342');
+        $('#start').css('border-color', '#ed6342');
+        $('#start').css('background', 'none');
+        $('h1').css('color', '#ed6342');
+  });
