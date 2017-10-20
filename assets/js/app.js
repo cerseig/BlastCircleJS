@@ -199,7 +199,7 @@ class Circle {
 /* App */
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
-const audio = new Audio('./assets/sounds/photomaton.mp3')
+const audio = new Audio('./assets/sounds/yellowclaw.mp3')
 const pool = new Pool({
     klass: Point,
     nbEntities: 1500
@@ -261,17 +261,6 @@ function createCircle() {
     circles.push( circle )
 }
 
-// function createCircles() {
-//     var rand = getRandom(200, 1000);
-//     setTimeout(function() {
-//             createCircle();
-//             createCircles();
-//     }, rand);
-//     // setTimeout(function() {
-//     //     var circle = new Circle(pool)
-//     //     circles.push( circle )
-//     // }, 800 )
-// }
 var lastindex = 0
 function render() {
     requestAnimationFrame( render )
@@ -301,9 +290,10 @@ function render() {
         $('h3').css('font-size', '2.8em')
         $('h3').css('opacity', '0.4')
     } else if (frequence < 20 ) {
-        $('h3').css('font-size', '5em')
+        $('h3').css('font-size', '3em')
         $('h3').css('opacity', '0.8')
     } else if (frequence < 25 ) {
+      $('h3').css('font-size', '5em')
         $('h3').css('opacity', '1')
     }
 
@@ -331,7 +321,15 @@ function render() {
         lastCoord = [];
     }
 
-    ctx.fillStyle = 'rgba(80,29,67,0.3)'
+    if(frequence > 23) {
+      ctx.fillStyle = 'rgba(255,255,255, 0.3)'
+      $('#myCanvas').css('background', '#FFF')
+      // $('h3').css('color', '#501d43')
+    } else {
+      ctx.fillStyle = 'rgba(80,29,67,0.3)'
+      $('#myCanvas').css('background', '#501d43')
+      $('h3').css('color', '#FFF')
+    }
     ctx.fillRect(0, 0, canvasWidth, canvasHeight)
     ctx.beginPath()
     ctx.lineWidth = 3
@@ -365,10 +363,12 @@ $( "#start" )
         $('#start').css('border-color', '#f6c543');
         $('#start').css('font-weight', 'bold');
         $('h1').css('color', '#f6c543');
+        $('p').css('color', '#ed6342');
   })
   .mouseleave(function() {
         $('#start').css('color', '#ed6342');
         $('#start').css('border-color', '#ed6342');
         $('#start').css('background', 'none');
         $('h1').css('color', '#ed6342');
+        $('p').css('color', '#f6c543');
   });

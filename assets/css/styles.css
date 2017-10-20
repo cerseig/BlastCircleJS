@@ -1,3 +1,18 @@
+/****************
+*** ANIMATION ***
+*****************/
+@keyframes Blinking {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.2;
+    }
+    100% {
+      opacity: 1;
+    }
+}
+
 /**************
 *** GENERAL ***
 ***************/
@@ -10,6 +25,7 @@ body, html {
     margin: 0;
     padding: 0;
     -webkit-font-smoothing : antialiased;
+    overflow: hidden;
 }
 
 /*******************
@@ -21,6 +37,11 @@ body, html {
     left: 50%;
     transform: translate(-50%,-50%);
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 }
 .landing-gate h1 {
     font-family: 'Montserrat';
@@ -40,6 +61,15 @@ body, html {
     margin-top: 0px;
     margin-bottom: 80px;
     color: #fefefe;
+    margin-bottom: 0;
+}
+.landing-gate p {
+  font-size: 2em;
+  font-weight: 200;
+  font-family: 'Assistant';
+  color:#f6c543;
+  margin-bottom: 60px;
+  transition: all 0.5s ease;
 }
 .landing-gate a {
     border-radius: 0;
@@ -55,7 +85,10 @@ body, html {
     cursor: pointer;
     color: #ed6342;
     transition: all 0.5s ease;
-
+    animation: Blinking 1s infinite;
+}
+.landing-gate a:hover {
+  animation: none;
 }
 .landing-gate a:focus {
     outline: none;
@@ -109,4 +142,5 @@ h3 small {
 **************/
 #myCanvas {
   background: #501d43;
+  /*background: #FFF;*/
 }
